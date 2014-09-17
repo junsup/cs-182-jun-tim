@@ -51,6 +51,37 @@ def tinyMazeSearch(problem):
   w = Directions.WEST
   return  [s,s,w,s,w,w,s,w]
 
+class Node:
+  def __init__ (self, state, parent, action, cost):
+    self.state = state
+    self.parent = parent
+    self.action = action
+    self.cost = cost
+
+  def expand (self, problem):
+    successors = []
+    for successor_state, action, cost in problem.getSuccessors(self.state):
+      successors.append(Node(successor_state, self, action, self.cost + cost))
+    return successors
+
+def treeSearch(problem, fringe):
+  visited_states = set()
+  fringe.push(Node(problem.getStartState(), None, None, 0))
+  while not fringe.isEmpty():
+    current_node = fringe.pop()
+    if problem.isGoalState(current_node.state):
+      actions = []
+      while (current_node.action is not None):
+        actions.append(current_node.action)
+        current_node = current_node.parent
+      actions.reverse()
+      return actions
+    if current_node.state not in visited_states:
+      visited_states.add(current_node.state)
+      for successor in current_node.expand(problem):
+        fringe.push(successor)
+  return []
+
 def depthFirstSearch(problem):
   """
   Search the deepest nodes in the search tree first. [p 74].
@@ -59,12 +90,12 @@ def depthFirstSearch(problem):
   the goal.  
   """
   "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  return treeSearch(problem, util.Stack())
 
 def breadthFirstSearch(problem):
   "Search the shallowest nodes in the search tree first. [p 74]"
   "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  return treeSearch(problem, util.Queue())
       
 def uniformCostSearch(problem):
   "Search the node of least total cost first. "
