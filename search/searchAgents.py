@@ -374,7 +374,8 @@ def foodHeuristic(state):
   this works, come to office hours.
   """
   "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  return state[1].count()
+
 
 class AStarFoodSearchAgent(SearchAgent):
   """
@@ -382,23 +383,22 @@ class AStarFoodSearchAgent(SearchAgent):
 
   You should use either foodHeuristic or getFoodHeuristic in your code here.
   """
-
-  "*** YOUR CODE HERE ***"
+  def __init__(self, searchFunction=search.aStarSearch, searchType=FoodSearchProblem):
+    SearchAgent.__init__(self, lambda problem: searchFunction(problem, foodHeuristic), searchType)
 
 class GreedyFoodSearchAgent(SearchAgent):
   """
   An agent that computes a path to eat all the dots using greedy search.
   """
-  "*** YOUR CODE HERE ***"
-
-
+  def __init__(self, searchFunction=search.greedySearch, searchType=FoodSearchProblem):
+    SearchAgent.__init__(self, lambda problem: searchFunction(problem, foodHeuristic), searchType)
 
 
 class TrivialAStarFoodSearchAgent(AStarFoodSearchAgent):
   """
   An AStarFoodSearchAgent that uses the trivial heuristic instead of the one defined by getFoodHeuristic
   """
-  def __init__(self, searchFunction=None, searchType=FoodSearchProblem):
+  def __init__(self, searchFunction=search.aStarSearch, searchType=FoodSearchProblem):
     # Redefine getFoodHeuristic to return the trivial one.
     __import__(__name__).getFoodHeuristic = lambda gameState: trivialFoodHeuristic
     __import__(__name__).foodHeuristic    = trivialFoodHeuristic
