@@ -4,19 +4,19 @@ import util
 class SearchProblem:
   """
   Abstract SearchProblem class. Your classes
-  should inherit from this class and override 
+  should inherit from this class and override
   all the methods below
   """
   def getStartState(self):
      """
-     Returns the start state for the search problem 
+     Returns the start state for the search problem
      """
      util.raiseNotDefined()
-    
+
   def isGoalState(self, state):
      """
        state: Search state
-    
+
      Returns True if and only if the state is a valid goal state
      """
      util.raiseNotDefined()
@@ -24,11 +24,11 @@ class SearchProblem:
   def getSuccessors(self, state):
      """
        state: Search state
-     
-     For a given state, this should return a list of triples, 
-     (successor, action, stepCost), where 'successor' is a 
+
+     For a given state, this should return a list of triples,
+     (successor, action, stepCost), where 'successor' is a
      successor to the current state, 'action' is the action
-     required to get there, and 'stepCost' is the incremental 
+     required to get there, and 'stepCost' is the incremental
      cost of expanding to that successor
      """
      util.raiseNotDefined()
@@ -36,12 +36,12 @@ class SearchProblem:
   def getCostOfActions(self, actions):
      """
       actions: A list of actions to take
- 
+
      This method returns the total cost of a particular sequence of actions.  The sequence must
      be composed of legal moves
      """
      util.raiseNotDefined()
-           
+
 
 def tinyMazeSearch(problem):
   """Returns a sequence of moves that solves tinyMaze.  For any other
@@ -64,9 +64,10 @@ class Node:
       successors.append(Node(successor_state, self, action, self.cost + cost))
     return successors
 
-def treeSearch(problem, fringe):
+def treeSearch(problem, fringe, insert=lambda x, y: x.push(y)):
   visited_states = set()
-  fringe.push(Node(problem.getStartState(), None, None, 0))
+  insert(fringe, Node(problem.getStartState(), None, None, 0))
+  #fringe.push(Node(problem.getStartState(), None, None, 0))
   while not fringe.isEmpty():
     current_node = fringe.pop()
     if problem.isGoalState(current_node.state):
@@ -79,28 +80,28 @@ def treeSearch(problem, fringe):
     if current_node.state not in visited_states:
       visited_states.add(current_node.state)
       for successor in current_node.expand(problem):
-        fringe.push(successor)
+        insert(fringe, successor)
+        #fringe.push(successor)
   return []
 
 def depthFirstSearch(problem):
   """
   Search the deepest nodes in the search tree first. [p 74].
-  
+
   Your search algorithm needs to return a list of actions that reaches
-  the goal.  
+  the goal.
   """
-  "*** YOUR CODE HERE ***"
   return treeSearch(problem, util.Stack())
 
 def breadthFirstSearch(problem):
   "Search the shallowest nodes in the search tree first. [p 74]"
-  "*** YOUR CODE HERE ***"
   return treeSearch(problem, util.Queue())
-      
+
 def uniformCostSearch(problem):
   "Search the node of least total cost first. "
-  "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  def insert(fringe, node):
+    fringe.push(node, node.cost)
+  return treeSearch(problem, util.PriorityQueue(), insert)
 
 def nullHeuristic(state):
   """
@@ -111,12 +112,14 @@ def nullHeuristic(state):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
   "Search the node that has the lowest combined cost and heuristic first."
-  "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
-    
+  def insert(fringe, node):
+    fringe.push(node, node.cost + heuristic(node.state))
+  return treeSearch(problem, util.PriorityQueue(), insert)
+
 def greedySearch(problem, heuristic=nullHeuristic):
   "Search the node that has the lowest heuristic first."
-  "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+  def insert(fringe, node):
+    fringe.push(node, heuristic(node.state))
+  return treeSearch(problem, util.PriorityQueue(), insert)
 
 
