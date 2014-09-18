@@ -1,3 +1,5 @@
+# Jun Lee, Tim McLaughlin
+
 """
 This file contains all of the agents that can be selected to
 control Pacman.  To select an agent, simple use the '-p' option

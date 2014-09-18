@@ -1,3 +1,5 @@
+# Jun Lee, Tim McLaughlin
+
 import util
 ## Abstract Search Classes
 
