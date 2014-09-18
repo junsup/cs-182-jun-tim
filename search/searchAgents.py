@@ -373,8 +373,14 @@ def foodHeuristic(state):
   function closure (like the manhattanAStar function above).  If you don't know how
   this works, come to office hours.
   """
-  "*** YOUR CODE HERE ***"
-  return state[1].count()
+  curX, curY = state[0]
+  board = state[1]
+  maxDist = 0
+  for (x, y) in board.asList():
+      manhattanDist = abs(x - curX) + abs(y - curY)
+      maxDist = max(maxDist, manhattanDist)
+
+  return maxDist
 
 
 class AStarFoodSearchAgent(SearchAgent):
