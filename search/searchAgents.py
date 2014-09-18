@@ -353,9 +353,35 @@ def getFoodHeuristic(gameState):
   True or False.
   """
   # If you don't want to implement this method, you can leave this default implementation
-  return foodHeuristic
+  walls = gameState.walls
+  data = walls.data
+  distances = {}
+  for i in xrange(len(data)):
+    for j in xrange(len(data[0])):
+      if data[i][j]:
+        continue
+      coord = (i, j)
+      queue = util.Queue()
+      queue.push((coord, 0))
+      visited = set()
+      while not queue.isEmpty():
+        coord_, dist = queue.pop()
+        visited.add(coord_)
+        distances[(coord, coord_)] = dist
+        x, y = coord_
+        for (dx , dy) in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            try:
+              newX = x + dx
+              newY = y + dy
+              if (newX, newY) in visited or data[newX][newY]:
+                continue
+              queue.push(((newX, newY), dist + 1))
+            except:
+              pass
 
-def foodHeuristic(state):
+  return lambda state: foodHeuristic(state, distances)
+
+def foodHeuristic(state, distances):
   """
   Here, you can write your food heuristic function instead of using getFoodHeuristic.
   This heuristic must be admissible (if your AStarFoodSearchAgent and your
@@ -373,12 +399,13 @@ def foodHeuristic(state):
   function closure (like the manhattanAStar function above).  If you don't know how
   this works, come to office hours.
   """
-  curX, curY = state[0]
+
+  pacCoord = state[0]
   board = state[1]
   maxDist = 0
-  for (x, y) in board.asList():
-      manhattanDist = abs(x - curX) + abs(y - curY)
-      maxDist = max(maxDist, manhattanDist)
+  for coord in board.asList():
+      dist = distances[(pacCoord, coord)]
+      maxDist = max(maxDist, dist)
 
   return maxDist
 
@@ -390,14 +417,14 @@ class AStarFoodSearchAgent(SearchAgent):
   You should use either foodHeuristic or getFoodHeuristic in your code here.
   """
   def __init__(self, searchFunction=search.aStarSearch, searchType=FoodSearchProblem):
-    SearchAgent.__init__(self, lambda problem: searchFunction(problem, foodHeuristic), searchType)
+    SearchAgent.__init__(self, lambda problem: searchFunction(problem, getFoodHeuristic(problem)), searchType)
 
 class GreedyFoodSearchAgent(SearchAgent):
   """
   An agent that computes a path to eat all the dots using greedy search.
   """
   def __init__(self, searchFunction=search.greedySearch, searchType=FoodSearchProblem):
-    SearchAgent.__init__(self, lambda problem: searchFunction(problem, foodHeuristic), searchType)
+    SearchAgent.__init__(self, lambda problem: searchFunction(problem, getFoodHeuristic(problem)), searchType)
 
 
 class TrivialAStarFoodSearchAgent(AStarFoodSearchAgent):
