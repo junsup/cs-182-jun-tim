@@ -135,7 +135,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
     # print self.getMax(gameState)[1]
     return self.getMax(gameState)[0]
 
-  def getMax(self, gameState, depth=0):
+  def getMax(self, gameState, depth=1):
     legalMoves = gameState.getLegalPacmanActions()
     # Default initialization of return values
     maxEval = -float("inf")
@@ -160,27 +160,24 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
     legalMoves = gameState.getLegalActions(agentIndex)
     # Default initialization of return value
-    minEvals = []
+    evals = []
     # If last ghost, increment depth
     if agentIndex == gameState.getNumAgents() - 1:
-      depth += 1
       if depth == self.depth:
         for move in legalMoves:
           successorState = gameState.generateSuccessor(agentIndex, move)
           successorEval = self.evaluationFunction(successorState)
-          minEvals.append(successorEval)
+          evals.append(successorEval)
       else:
         for move in legalMoves:
           successorState = gameState.generateSuccessor(agentIndex, move)
-          minEvals.append(self.getMax(successorState, depth)[1])
+          evals.append(self.getMax(successorState, depth + 1)[1])
     else:
         for move in legalMoves:
           successorState = gameState.generateSuccessor(agentIndex, move)
-          minEvals.append(self.getMin(successorState, agentIndex + 1, depth))
-    if minEvals:
-      return min(minEvals)
-      # Avg??
-      #return sum(minEvals)/float(len(minEvals))
+          evals.append(self.getMin(successorState, agentIndex + 1, depth))
+    if evals:
+      return min(evals)
     return float("inf")
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -194,7 +191,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     "*** YOUR CODE HERE ***"
     # print self.getMax(gameState)[1]
-    return self.getMax(gameState, 0, -float("inf"), float("inf"))[0]
+    return self.getMax(gameState, 1, -float("inf"), float("inf"))[0]
 
   def getMax(self, gameState, depth, alpha, beta):
     legalMoves = gameState.getLegalPacmanActions()
@@ -228,15 +225,14 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
     legalMoves = gameState.getLegalActions(agentIndex)
     # Default initialization of return value
-    minEvals = []
+    evals = []
     # If last ghost, increment depth
     if agentIndex == gameState.getNumAgents() - 1:
-      depth += 1
       if depth == self.depth:
         for move in legalMoves:
           successorState = gameState.generateSuccessor(agentIndex, move)
           successorEval = self.evaluationFunction(successorState)
-          minEvals.append(successorEval)
+          evals.append(successorEval)
         # Alpha beta pruning
         if successorEval <= alpha:
           return successorEval
@@ -244,8 +240,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       else:
         for move in legalMoves:
           successorState = gameState.generateSuccessor(agentIndex, move)
-          successorEval = self.getMax(successorState, depth, alpha, beta)[1]
-          minEvals.append(successorEval)
+          successorEval = self.getMax(successorState, depth + 1, alpha, beta)[1]
+          evals.append(successorEval)
         # Alpha beta pruning
         if successorEval <= alpha:
           return successorEval
@@ -254,13 +250,13 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         for move in legalMoves:
           successorState = gameState.generateSuccessor(agentIndex, move)
           successorEval = self.getMin(successorState, agentIndex + 1, depth, alpha, beta)
-          minEvals.append(successorEval)
+          evals.append(successorEval)
         # Alpha beta pruning
         if successorEval <= alpha:
           return successorEval
         beta = min(beta, successorEval)
-    if minEvals:
-      return min(minEvals)
+    if evals:
+      return min(evals)
     return float("inf")
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
@@ -276,7 +272,54 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       legal moves.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # print self.getMax(gameState)[1]
+    return self.getMax(gameState)[0]
+
+  def getMax(self, gameState, depth=0):
+    legalMoves = gameState.getLegalPacmanActions()
+    # Default initialization of return values
+    maxEval = -float("inf")
+    maxMoves = set([Directions.STOP])
+
+    for move in legalMoves:
+      successorState = gameState.generatePacmanSuccessor(move)
+      successorEval = self.getExpected(successorState, 1, depth)
+      if successorEval > maxEval:
+        maxMoves = set([move])
+        maxEval = successorEval
+      elif successorEval == maxEval:
+        maxMoves.add(move)
+    # Avoid not moving unless it has the absolute max utility
+    if len(maxMoves) > 1 and Directions.STOP in maxMoves:
+      maxMoves.remove(Directions.STOP)
+    return random.choice(list(maxMoves)), maxEval
+
+  def getExpected(self, gameState, agentIndex, depth):
+    if gameState.isWin() or gameState.isLose():
+      return self.evaluationFunction(gameState)
+
+    legalMoves = gameState.getLegalActions(agentIndex)
+    # Default initialization of return value
+    evals = []
+    # If last ghost, increment depth
+    if agentIndex == gameState.getNumAgents() - 1:
+      if depth == self.depth:
+        for move in legalMoves:
+          successorState = gameState.generateSuccessor(agentIndex, move)
+          successorEval = self.evaluationFunction(successorState)
+          evals.append(successorEval)
+      else:
+        for move in legalMoves:
+          successorState = gameState.generateSuccessor(agentIndex, move)
+          evals.append(self.getMax(successorState, depth + 1)[1])
+    else:
+        for move in legalMoves:
+          successorState = gameState.generateSuccessor(agentIndex, move)
+          evals.append(self.getExpected(successorState, agentIndex + 1, depth))
+    # Return expected value of evals with naive probability
+    if evals:
+      return sum(evals)/len(evals)
+    return float(0)
 
 def betterEvaluationFunction(currentGameState):
   """
