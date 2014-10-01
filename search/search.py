@@ -66,7 +66,7 @@ class Node:
       successors.append(Node(successor_state, self, action, self.cost + cost))
     return successors
 
-def treeSearch(problem, fringe, insert = lambda x, y: x.push(y)):
+def treeSearch(problem, fringe, insert=lambda x, y: x.push(y)):
   visited_states = set()
   insert(fringe, Node(problem.getStartState(), None, None, 0))
   #fringe.push(Node(problem.getStartState(), None, None, 0))
