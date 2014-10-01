@@ -72,8 +72,6 @@ class ReflexAgent(Agent):
 
     if min(manhattanDsToGhosts) < 2:
       return -float("inf")
-
-    "*** YOUR CODE HERE ***"
     return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
@@ -139,6 +137,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
     legalMoves = gameState.getLegalPacmanActions()
     # Default initialization of return values
     maxEval = -float("inf")
+    # There can be multiple moves that share maxEval
     maxMoves = set([Directions.STOP])
 
     for move in legalMoves:
@@ -197,6 +196,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     legalMoves = gameState.getLegalPacmanActions()
     # Default initialization of return values
     maxEval = -float("inf")
+    # There can be multiple moves that share maxEval
     maxMoves = set([Directions.STOP])
 
     for move in legalMoves:
@@ -279,6 +279,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     legalMoves = gameState.getLegalPacmanActions()
     # Default initialization of return values
     maxEval = -float("inf")
+    # There can be multiple moves that share maxEval
     maxMoves = set([Directions.STOP])
 
     for move in legalMoves:
