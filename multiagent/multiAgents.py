@@ -70,15 +70,15 @@ class ReflexAgent(Agent):
 
     # calculates manhattan distance to closest food
     try:
-        foodDist = min([manhattanDistance(newPos, x)
-            for x in newFood.asList()])
+      foodDist = min([manhattanDistance(newPos, x)
+        for x in newFood.asList()])
     except ValueError:
-        foodDist = 0
+      foodDist = 0
     foodScore = 1.0 / (foodDist + 0.01)
 
     # calculates manhattan distance to closest ghost
     ghostDist = min([manhattanDistance(newPos, x.getPosition())
-        for x in newGhostStates])
+      for x in newGhostStates])
     ghostScore = -1.0 / (ghostDist + 0.001)
 
     return successorGameState.getScore() + ghostScore +  foodScore
@@ -108,7 +108,7 @@ class MultiAgentSearchAgent(Agent):
     is another abstract class.
   """
 
-  def __init__(self, evalFn = 'scoreEvaluationFunction', depth = '2'):
+  def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
     self.index = 0 # Pacman is always agent index 0
     self.evaluationFunction = util.lookup(evalFn, globals())
     self.depth = int(depth)
@@ -138,8 +138,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
       gameState.getNumAgents():
         Returns the total number of agents in the game
     """
-    "*** YOUR CODE HERE ***"
-    # print self.getMax(gameState)[1]
     return self.getMax(gameState)[0]
 
   def getMax(self, gameState, depth=1):
@@ -197,8 +195,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
       Returns the minimax action using self.depth and self.evaluationFunction
     """
-    "*** YOUR CODE HERE ***"
-    # print self.getMax(gameState)[1]
+    # print self.getMax(gameState, 1, -float("inf"), float("inf"))[1]
     return self.getMax(gameState, 1, -float("inf"), float("inf"))[0]
 
   def getMax(self, gameState, depth, alpha, beta):
@@ -280,8 +277,6 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       All ghosts should be modeled as choosing uniformly at random from their
       legal moves.
     """
-    "*** YOUR CODE HERE ***"
-    # print self.getMax(gameState)[1]
     return self.getMax(gameState)[0]
 
   def getMax(self, gameState, depth=0):
@@ -338,8 +333,33 @@ def betterEvaluationFunction(currentGameState):
 
     DESCRIPTION: <write something here so we know what you did>
   """
-  "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+
+  if currentGameState.isLose():
+    return float("-inf")
+  elif currentGameState.isWin():
+    return float("inf")
+
+  curPos = currentGameState.getPacmanPosition()
+
+  # food evaluations
+  foodPositions = currentGameState.getFood().asList()
+  nFood = len(foodPositions)
+  if nFood is 0:
+    foodEval = 0
+  else:
+    foodDist = [manhattanDistance(curPos, x) for x in foodPositions]
+    averageFoodDist = float(sum(foodDist)) / nFood
+    foodEval = 1.0 / (nFood + averageFoodDist)
+
+  # ghost evaluation
+  ghostEval = 0
+  for ghostPos in currentGameState.getGhostPositions():
+    ghostEval += 1.0 / (manhattanDistance(curPos, ghostPos) + .001) ** 2
+
+
+  # print currentGameState.getNumFood()
+  result = foodEval + ghostEval + currentGameState.getScore()
+  return result
 
 # Abbreviation
 better = betterEvaluationFunction
