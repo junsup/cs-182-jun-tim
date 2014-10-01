@@ -71,7 +71,7 @@ class ReflexAgent(Agent):
     manhattanDsToGhosts = [util.manhattanDistance(newPos, newGhostPosition) for newGhostPosition in newGhostPositions] 
 
     if min(manhattanDsToGhosts) < 2:
-      return -float('inf')
+      return -float("inf")
 
     "*** YOUR CODE HERE ***"
     return successorGameState.getScore()
@@ -135,7 +135,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
     # print self.getMax(gameState)[1]
     return self.getMax(gameState)[0]
 
-  # Returns move with maximum utility for Pacman  
   def getMax(self, gameState, depth=0):
     legalMoves = gameState.getLegalPacmanActions()
     # Default initialization of return values
@@ -182,7 +181,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
       return min(minEvals)
       # Avg??
       #return sum(minEvals)/float(len(minEvals))
-    return float('inf')
+    return float("inf")
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
   """
@@ -194,7 +193,75 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       Returns the minimax action using self.depth and self.evaluationFunction
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # print self.getMax(gameState)[1]
+    return self.getMax(gameState, 0, -float("inf"), float("inf"))[0]
+
+  def getMax(self, gameState, depth, alpha, beta):
+    legalMoves = gameState.getLegalPacmanActions()
+    # Default initialization of return values
+    maxEval = -float("inf")
+    maxMoves = set([Directions.STOP])
+
+    for move in legalMoves:
+      successorState = gameState.generatePacmanSuccessor(move)
+      successorEval = self.getMin(successorState, 1, depth, alpha, beta)
+      if successorEval > maxEval:
+        maxMoves = set([move])
+        maxEval = successorEval
+      elif successorEval == maxEval:
+        maxMoves.add(move)
+      # Alpha beta pruning
+      if maxEval >= beta:
+        # Avoid not moving unless it has the absolute max utility
+        if len(maxMoves) > 1 and Directions.STOP in maxMoves:
+          maxMoves.remove(Directions.STOP)
+        return random.choice(list(maxMoves)), maxEval
+      alpha = max(alpha, maxEval)
+    # Avoid not moving unless it has the absolute max utility
+    if len(maxMoves) > 1 and Directions.STOP in maxMoves:
+      maxMoves.remove(Directions.STOP)
+    return random.choice(list(maxMoves)), maxEval
+
+  def getMin(self, gameState, agentIndex, depth, alpha, beta):
+    if gameState.isWin() or gameState.isLose():
+      return self.evaluationFunction(gameState)
+
+    legalMoves = gameState.getLegalActions(agentIndex)
+    # Default initialization of return value
+    minEvals = []
+    # If last ghost, increment depth
+    if agentIndex == gameState.getNumAgents() - 1:
+      depth += 1
+      if depth == self.depth:
+        for move in legalMoves:
+          successorState = gameState.generateSuccessor(agentIndex, move)
+          successorEval = self.evaluationFunction(successorState)
+          minEvals.append(successorEval)
+        # Alpha beta pruning
+        if successorEval <= alpha:
+          return successorEval
+        beta = min(beta, successorEval)
+      else:
+        for move in legalMoves:
+          successorState = gameState.generateSuccessor(agentIndex, move)
+          successorEval = self.getMax(successorState, depth, alpha, beta)[1]
+          minEvals.append(successorEval)
+        # Alpha beta pruning
+        if successorEval <= alpha:
+          return successorEval
+        beta = min(beta, successorEval)
+    else:
+        for move in legalMoves:
+          successorState = gameState.generateSuccessor(agentIndex, move)
+          successorEval = self.getMin(successorState, agentIndex + 1, depth, alpha, beta)
+          minEvals.append(successorEval)
+        # Alpha beta pruning
+        if successorEval <= alpha:
+          return successorEval
+        beta = min(beta, successorEval)
+    if minEvals:
+      return min(minEvals)
+    return float("inf")
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
   """
