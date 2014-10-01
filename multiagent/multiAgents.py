@@ -1,3 +1,4 @@
+# Jun Lee, Tim McLaughlin
 # multiAgents.py
 # --------------
 # Licensing Information: Please do not distribute or publish solutions to this
@@ -340,7 +341,6 @@ def betterEvaluationFunction(currentGameState):
     return float("inf")
 
   curPos = currentGameState.getPacmanPosition()
-
   # food evaluations
   foodPositions = currentGameState.getFood().asList()
   nFood = len(foodPositions)
@@ -351,6 +351,15 @@ def betterEvaluationFunction(currentGameState):
     averageFoodDist = float(sum(foodDist)) / nFood
     foodEval = 1.0 / (nFood + averageFoodDist)
 
+  capsulePositions = currentGameState.getCapsules()
+  nCapsules = len(capsulePositions)
+  if nCapsules is 0:
+    capsuleEval = 0
+  else:
+    capsuleDist = [manhattanDistance(curPos, x) for x in foodPositions]
+    averageCapsuleDist = float(sum(capsuleDist)) / nCapsules
+    capsuleEval = 4.0 / (nCapsules + averageCapsuleDist)
+
   # ghost evaluation
   ghostEval = 0
   for ghostPos in currentGameState.getGhostPositions():
@@ -358,7 +367,7 @@ def betterEvaluationFunction(currentGameState):
 
 
   # print currentGameState.getNumFood()
-  result = foodEval + ghostEval + currentGameState.getScore()
+  result = foodEval + capsuleEval + ghostEval + currentGameState.getScore()
   return result
 
 # Abbreviation
