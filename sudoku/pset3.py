@@ -97,8 +97,8 @@ class Sudoku:
 
   # PART 2: Swap out the implementation after implementing part 2
   def getSuccessors(self):
-    return self._getAllSuccessors()
-    # return self._getSuccessorsWithForwardChecking()
+    # return self._getAllSuccessors()
+    return self._getSuccessorsWithForwardChecking()
 
   def isFinalState(self):
     return self._getFirstEmptySquare() == None
