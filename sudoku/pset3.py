@@ -69,8 +69,12 @@ class Sudoku:
 
   def _getAllSuccessors(self):
     # PART 1 goes here.
-    print dir(self)
-    raise NotImplementedError
+    emptySquare = self._getEmptySquare()
+    possibleValues = self._getPossibleValsFor(emptySquare)
+    successors = []
+    for val in possibleValues:
+        successors.append(self._fillEmptySquare(emptySquare, val))
+    return successors
 
   def _getSuccessorsWithForwardChecking(self):
     return [s for s in self._getAllSuccessors() if s._forwardCheck()]
