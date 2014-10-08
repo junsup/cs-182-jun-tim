@@ -69,6 +69,7 @@ class Sudoku:
 
   def _getAllSuccessors(self):
     # PART 1 goes here.
+    print dir(self)
     raise NotImplementedError
 
   def _getSuccessorsWithForwardChecking(self):
