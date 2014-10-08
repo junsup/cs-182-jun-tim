@@ -19,13 +19,24 @@ class Sudoku:
     return None
 
   def _getMostConstrainedEmptySquare(self):
-    # Part 3 goes here.
-    raise NotImplementedError
+    most_constrained = float("inf")
+    most_constrained_coord = None
+    for x in xrange(0,9):
+      for y in xrange(0,9):
+        if self.board[x][y]:
+          continue
+        if len(self._getPossibleValsFor((x,y))) < most_constrained:
+          most_constrained_coord = (x,y)
+
+    if most_constrained_coord is None:
+        raise NotImplementedError
+
+    return most_constrained_coord
 
   # PART 3: Swap out the implementation after implementing part 3
   def _getEmptySquare(self):
-    return self._getFirstEmptySquare()
-    # return self._getMostConstrainedEmptySquare()
+    # return self._getFirstEmptySquare()
+    return self._getMostConstrainedEmptySquare()
 
   def _getRow(self, x):
     return list(self.board[x])
