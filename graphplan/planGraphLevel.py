@@ -109,10 +109,10 @@ class PlanGraphLevel(object):
             for prop2 in currentLayerPropositions:
               if prop1 == prop2:
                 continue
-              if Pair(prop1, prop2) in currentLayerMutexActions:
+              if Pair(prop1, prop2) in self.propositionLayer.getMutexProps():
                 continue
-              if self.mutexPropositions(prop1, prop2, currentLayerMutexActions):
-                currentLayerPropositions.addMutexProp(prop1, prop2)
+              if mutexPropositions(prop1, prop2, currentLayerMutexActions):
+                self.propositionLayer.addMutexProp(prop1, prop2)
 
 
   def expand(self, previousLayer):
