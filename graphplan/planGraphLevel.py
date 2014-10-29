@@ -118,7 +118,14 @@ def mutexActions(a1, a2, mutexProps):
   Your updateMutexActions function should call this function
   """
   "*** YOUR CODE HERE ***"
-  
+  if Pair(a1, a2) not in PlanGraphLevel.independentActions:
+      return True
+  for preA1 in a1.getPre():
+      for preA2 in a2.getPre():
+          if Pair(preA1, preA2) in mutexProps:
+              return True
+  return False
+
 		
 def mutexPropositions(prop1, prop2, mutexActions):
   """
