@@ -66,7 +66,14 @@ class PlanGraphLevel(object):
     currentLayerActions are the actions in the current action layer
     """
     currentLayerActions = self.actionLayer.getActions()
-    "*** YOUR CODE HERE ***"
+    for a1 in currentLayerActions:
+      for a2 in currentLayerActions:
+        if a1 == a2:
+          continue
+        if Pair(a1, a2) in self.actionLayer.getMutexAction():
+          continue
+        if mutexActions(a1, a2, previousLayerMutexProposition):
+          self.actionLayer.addMutexActions(a1, a2)
 
 
   def updatePropositionLayer(self):
