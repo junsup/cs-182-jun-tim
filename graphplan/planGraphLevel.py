@@ -87,8 +87,16 @@ class PlanGraphLevel(object):
     don't forget to update the producers list!
     """
     currentLayerActions = self.actionLayer.getActions()
+    currentLayerPropositions = self.propositionLayer.getPropositions()
     "*** YOUR CODE HERE ***"
 
+    newPropositionLayer = PropositionLayer()
+    for prop in currentLayerPropositions:
+        if currentActionLayer.effectExists(prop):
+            newPropositionLayer.addProposition(prop)
+  
+    # set new proposition layer
+    self.setPropositionLayer(newPropositionLayer)
 
   def updateMutexProposition(self):
     """
@@ -97,6 +105,14 @@ class PlanGraphLevel(object):
     currentLayerPropositions = self.propositionLayer.getPropositions()
     currentLayerMutexActions =  self.actionLayer.getMutexActions()
     "*** YOUR CODE HERE ***"
+    for prop1 in currentLayerPropositions:
+            for prop2 in currentLayerPropositions:
+              if prop1 == prop2:
+                continue
+              if Pair(prop1, prop2) in currentLayerMutexActions:
+                continue
+              if self.mutexPropositions(prop1, prop2, currentLayerMutexActions):
+                currentLayerPropositions.addMutexProp(prop1, prop2)
 
 
   def expand(self, previousLayer):
