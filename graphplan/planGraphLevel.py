@@ -57,12 +57,17 @@ class PlanGraphLevel(object):
     """
     allActions = PlanGraphLevel.actions
     "*** YOUR CODE HERE ***"
+    newActionLayer = ActionLayer()
+    for action in allActions:
+      if previousPropositionLayer.allPrecondsInLayer(action):
+              newActionLayer.addAction(action)
+    self.setActionLayer(newActionLayer)
 
 
   def updateMutexActions(self, previousLayerMutexProposition):
     """
     Updates the mutex list in self.actionLayer,
-    given the mutex proposition from the previous layer.
+    given the mutex proposition from the previous layer. 
     currentLayerActions are the actions in the current action layer
     """
     currentLayerActions = self.actionLayer.getActions()
