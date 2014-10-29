@@ -207,7 +207,8 @@ def independentPair(a1, a2):
   Returns true if the actions are neither have inconsistent effects
   nor they interfere one with the other
   """
-
+  if (a1 == a2):
+    return True
   for (x, y) in [(a1, a2), (a2, a1)]:
     for deleted in x.getDelete():
       # check inconsistence and interference
