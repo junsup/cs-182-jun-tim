@@ -30,13 +30,13 @@ class GraphPlan(object):
     PlanGraphLevel.setIndependentActions(self.independentActions)
     PlanGraphLevel.setActions(self.actions)
     PlanGraphLevel.setProps(self.propositions)
- 
-    
-  def graphPlan(self): 
+
+
+  def graphPlan(self):
     """
-    The graphplan algorithm. 
+    The graphplan algorithm.
     The code calls the extract function which you should complete below
-    """    
+    """
     #initialization
     initState = self.initialState
     level = 0
@@ -48,30 +48,30 @@ class GraphPlan(object):
       propLayerInit.addProposition(prop)
     pgInit = PlanGraphLevel()
     pgInit.setPropositionLayer(propLayerInit)
-    self.graph.append(pgInit)   
-    
+    self.graph.append(pgInit)
+
     """
     While the layer does not contain all of the propositions in the goal state,
     or some of these propositions are mutex in the layer we,
     and we have not reached the fixed point, continue expanding the graph
     """
-   
+
     while self.goalStateNotInPropLayer(self.graph[level].getPropositionLayer().getPropositions()) or \
         self.goalStateHasMutex(self.graph[level].getPropositionLayer()):
       if self.isFixed(level):
         return None #this means we stopped the while loop above because we reached a fixed point in the graph. nothing more to do, we failed!
-        
+
       self.noGoods.append([])
       level = level + 1
       pgNext = PlanGraphLevel() #create new PlanGraph object
       pgNext.expand(self.graph[level - 1]) #calls the expand function, which you are implementing in the PlanGraph class
       self.graph.append(pgNext) #appending the new level to the plan graph
-    
+
       sizeNoGood = len(self.noGoods[level]) #remember size of nogood table
-    
+
     plan = self.extract(self.graph, self.goal, level) #try to extract a plan since all of the goal propositions are in current graph level, and are not mutex
-    while(plan is None): #while we didn't extract a plan successfully       
-      level = level + 1 
+    while(plan is None): #while we didn't extract a plan successfully
+      level = level + 1
       self.noGoods.append([])
       pgNext = PlanGraphLevel() #create next level of the graph by expanding
       pgNext.expand(self.graph[level - 1]) #create next level of the graph by expanding
@@ -82,14 +82,14 @@ class GraphPlan(object):
           return None
         sizeNoGood = len(self.noGoods[level]) #we didn't fail yet! update size of no good
     return plan
-   
+
 
   def extract(self, Graph, subGoals, level):
     """
     The backsearch part of graphplan that tries
-    to extract a plan when all goal propositions exist in a graph plan level.	
+    to extract a plan when all goal propositions exist in a graph plan level.
     """
-    
+
     if level == 0:
       return []
     if subGoals in self.noGoods[level]:
@@ -99,20 +99,20 @@ class GraphPlan(object):
       return plan
     self.noGoods[level].append([subGoals])
     return None
-     
+
   def gpSearch(self, Graph, subGoals, plan, level):
 	if subGoals == []:
 	  newGoals = []
 	  for action in plan:
 		for prop in action.getPre():
 		  if prop not in newGoals:
-			newGoals.append(prop)						
+			newGoals.append(prop)
 	  newPlan = self.extract(Graph, newGoals, level - 1)
 	  if newPlan is None:
 		return None
 	  else:
 		return newPlan + plan
-		
+
 	prop = subGoals[0]
 	providers = []
 	for action1 in [act for act in Graph[level].getActionLayer().getActions() if prop in act.getAdd()]:
@@ -131,8 +131,8 @@ class GraphPlan(object):
 	  if newPlan is not None:
 		return newPlan
 	return None
-    
-	
+
+
   def goalStateNotInPropLayer(self, propositions):
     """
     Helper function that checks whether all propositions of the goal state are in the current graph level
@@ -140,8 +140,8 @@ class GraphPlan(object):
     for goal in self.goal:
       if goal not in propositions:
         return True
-    return False	
-	
+    return False
+
   def goalStateHasMutex(self, propLayer):
     """
     Helper function that checks whether all goal propositions are non mutex at the current graph level
@@ -151,23 +151,23 @@ class GraphPlan(object):
         if propLayer.isMutex(goal1,goal2):
           return True
     return False
-	
+
   def isFixed(self, level):
     """
     Checks if we have reached a fixed point, i.e. each level we'll expand would be the same, thus no point in continuing
     """
     if level == 0:
       return False
-    
+
     if len(self.graph[level].getPropositionLayer().getPropositions()) == len(self.graph[level - 1].getPropositionLayer().getPropositions()) and \
       len(self.graph[level].getPropositionLayer().getMutexProps()) == len(self.graph[level - 1].getPropositionLayer().getMutexProps()):
       return True
-    return False  
-	
+    return False
+
   def createNoOps(self):
     """
     Creates the noOps that are used to propagate propositions from one layer to the next
-    """   
+    """
     for prop in self.propositions:
       name = prop.name
       precon = []
@@ -178,7 +178,7 @@ class GraphPlan(object):
       act = Action(name,precon,add,delete, True)
       self.actions.append(act)
       prop.addProducer(act)
-   
+
   def independent(self):
     """
     Creates a list of independent actions
@@ -186,12 +186,12 @@ class GraphPlan(object):
     for act1 in self.actions:
       for act2 in self.actions:
         if independentPair(act1,act2):
-          self.independentActions.append(Pair(act1,act2)) 
+          self.independentActions.append(Pair(act1,act2))
 
   def isIndependent(self, a1, a2):
-    return Pair(a1,a2) in self.independentActions  
-  
-	
+    return Pair(a1,a2) in self.independentActions
+
+
   def noMutexActionInPlan(self, plan, act, actionLayer):
     """
     Helper action that you may want to use when extracting plans,
@@ -200,7 +200,7 @@ class GraphPlan(object):
     for planAct in plan:
       if actionLayer.isMutex(Pair(planAct,act)):
         return False
-    return True  
+    return True
 
 def independentPair(a1, a2):
   """
@@ -208,9 +208,9 @@ def independentPair(a1, a2):
   nor they interfere one with the other
   """
   "*** YOUR CODE HERE ***"
-  
-    
-if __name__ == '__main__':  
+
+
+if __name__ == '__main__':
   import sys
   import time
   if len(sys.argv) != 1 and len(sys.argv) != 3:
@@ -230,4 +230,4 @@ if __name__ == '__main__':
     print "Plan found with %d actions in %.2f seconds" % (len([act for act in plan if not act.isNoOp()]), elapsed)
   else:
     print "Could not find a plan in %.2f seconds" %  elapsed
- 
+
