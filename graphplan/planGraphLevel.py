@@ -66,7 +66,7 @@ class PlanGraphLevel(object):
   def updateMutexActions(self, previousLayerMutexProposition):
     """
     Updates the mutex list in self.actionLayer,
-    given the mutex proposition from the previous layer. 
+    given the mutex proposition from the previous layer.
     currentLayerActions are the actions in the current action layer
     """
     currentLayerActions = self.actionLayer.getActions()
@@ -74,7 +74,7 @@ class PlanGraphLevel(object):
       for a2 in currentLayerActions:
         if a1 == a2:
           continue
-        if Pair(a1, a2) in self.actionLayer.getMutexAction():
+        if Pair(a1, a2) in self.actionLayer.getMutexActions():
           continue
         if mutexActions(a1, a2, previousLayerMutexProposition):
           self.actionLayer.addMutexActions(a1, a2)
@@ -94,7 +94,7 @@ class PlanGraphLevel(object):
     for prop in currentLayerPropositions:
         if currentActionLayer.effectExists(prop):
             newPropositionLayer.addProposition(prop)
-  
+
     # set new proposition layer
     self.setPropositionLayer(newPropositionLayer)
 
@@ -126,7 +126,7 @@ class PlanGraphLevel(object):
     previousPropositionLayer = previousLayer.getPropositionLayer()
     previousLayerMutexProposition = previousPropositionLayer.getMutexProps()
 
-    self.updateActionLayer(previousLayerProposition)
+    self.updateActionLayer(previousPropositionLayer)
     self.updateMutexActions(previousLayerMutexProposition)
     self.updateMutexProposition()
 
