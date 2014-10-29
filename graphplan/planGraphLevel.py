@@ -59,7 +59,7 @@ class PlanGraphLevel(object):
     newActionLayer = ActionLayer()
     for action in allActions:
       if previousPropositionLayer.allPrecondsInLayer(action):
-              newActionLayer.addAction(action)
+        newActionLayer.addAction(action)
     self.setActionLayer(newActionLayer)
 
 
@@ -74,9 +74,9 @@ class PlanGraphLevel(object):
       for a2 in currentLayerActions:
         if a1 == a2:
           continue
-        if Pair(a1, a2) in self.actionLayer.getMutexActions():
+        if Pair(a1, a2) in self.propositionLayer.getMutexProps():
           continue
-        if mutexActions(a1, a2, previousLayerMutexProposition):
+        if mutexActions(a1, a2, self.actionLayer.getMutexActions()):
           self.actionLayer.addMutexActions(a1, a2)
 
 
@@ -148,10 +148,9 @@ def mutexActions(a1, a2, mutexProps):
   """
   if Pair(a1, a2) not in PlanGraphLevel.independentActions:
       return True
-  for preA1 in a1.getPre():
-      for preA2 in a2.getPre():
-          if Pair(preA1, preA2) in mutexProps:
-              return True
+  for x in [Pair(y, z) for y in a1.getPre() for z in a2.getPre()]:
+    if x in mutexProps:
+        return True
   return False
 
 
@@ -161,7 +160,7 @@ def mutexPropositions(prop1, prop2, mutexActions):
   given the mutex action from the current level (list of pairs of actions).
   Your updateMutexProposition function should call this function
   """
-  for x in [Pair(y, z) for y in prop1.getProducers() for z in prop2.getProducers]:
+  for x in [Pair(y, z) for y in prop1.getProducers() for z in prop2.getProducers()]:
     if x not in mutexActions:
       return False
   return True
