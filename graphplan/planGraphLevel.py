@@ -56,7 +56,6 @@ class PlanGraphLevel(object):
     allAction is the list of all the action (include noOp in the domain)
     """
     allActions = PlanGraphLevel.actions
-    "*** YOUR CODE HERE ***"
     newActionLayer = ActionLayer()
     for action in allActions:
       if previousPropositionLayer.allPrecondsInLayer(action):
@@ -111,7 +110,9 @@ class PlanGraphLevel(object):
     previousPropositionLayer = previousLayer.getPropositionLayer()
     previousLayerMutexProposition = previousPropositionLayer.getMutexProps()
 
-    "*** YOUR CODE HERE ***"
+    self.updateActionLayer(previousLayerProposition)
+    self.updateMutexActions(previousLayerMutexProposition)
+    self.updateMutexProposition()
 
 
   def expandWithoutMutex(self, previousLayer):
