@@ -104,11 +104,11 @@ class PlanGraphLevel(object):
     currentLayerPropositions = self.propositionLayer.getPropositions()
     currentLayerMutexActions =  self.actionLayer.getMutexActions()
     for prop1 in currentLayerPropositions:
-            for prop2 in currentLayerPropositions:
-              if prop1 == prop2:
-                continue
-              if mutexPropositions(prop1, prop2, currentLayerMutexActions):
-                self.propositionLayer.addMutexProp(prop1, prop2)
+      for prop2 in currentLayerPropositions:
+        if prop1 == prop2:
+          continue
+        if mutexPropositions(prop1, prop2, currentLayerMutexActions):
+          self.propositionLayer.addMutexProp(prop1, prop2)
 
 
   def expand(self, previousLayer):
@@ -145,6 +145,7 @@ def mutexActions(a1, a2, mutexProps):
   """
   if Pair(a1, a2) not in PlanGraphLevel.independentActions:
       return True
+
   for x in [Pair(y, z) for y in a1.getPre() for z in a2.getPre()]:
     if x in mutexProps:
         return True
