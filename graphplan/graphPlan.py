@@ -207,15 +207,15 @@ def independentPair(a1, a2):
   Returns true if the actions are neither have inconsistent effects
   nor they interfere one with the other
   """
-  if (a1 == a2):
+  if a1 == a2:
     return True
-  for (x, y) in [(a1, a2), (a2, a1)]:
-    for deleted in x.getDelete():
-      # check inconsistence and interference
-      if y.isPosEffect(deleted) or y.isPreCond(deleted):
-        return False
+  for prop in a1.getDelete():
+    if (a2.isPreCond(prop) or a2.isPosEffect(prop)):
+      return False
+  for prop in a2.getDelete():
+    if (a1.isPreCond(prop) or a1.isPosEffect(prop)):
+      return False
   return True
-
 
 if __name__ == '__main__':
   import sys
