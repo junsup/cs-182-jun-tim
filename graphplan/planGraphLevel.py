@@ -89,13 +89,13 @@ class PlanGraphLevel(object):
     propsToAdd = dict()
     for action in currentLayerActions:
       for prop in action.getAdd():
-        if prop.getName() not in propsToAdd:         
+        if prop.getName() not in propsToAdd:
           propsToAdd[prop.getName()] = Proposition(prop.getName())
         temp = propsToAdd[prop.getName()]
         if action not in temp.getProducers():
           temp.addProducer(action)
     for prop in propsToAdd.values():
-      self.propositionLayer.addProposition(prop)  
+      self.propositionLayer.addProposition(prop)
 
   def updateMutexProposition(self):
     """
@@ -160,5 +160,5 @@ def mutexPropositions(prop1, prop2, mutexActions):
   for a1 in prop1.getProducers():
     for a2 in prop2.getProducers():
       if Pair(a1, a2) not in mutexActions:
-        return False          
+        return False
   return True
