@@ -25,34 +25,47 @@ class PlanningProblem():
     PlanGraphLevel.setActions(self.actions)
     PlanGraphLevel.setProps(self.propositions)
     self._expanded = 0
-   
-    
+
+
   def getStartState(self):
-    "*** YOUR CODE HERE ***"   
-    
-    
+    return self.initialState
+
+
   def isGoalState(self, state):
-    "*** YOUR CODE HERE ***"
-  
+    return not self.goalStateNotInPropLayer(state)
+
 
   def getSuccessors(self, state):
-    """   
-    For a given state, this should return a list of triples, 
-    (successor, action, stepCost), where 'successor' is a 
+    """
+    For a given state, this should return a list of triples,
+    (successor, action, stepCost), where 'successor' is a
     successor to the current state, 'action' is the action
-    required to get there, and 'stepCost' is the incremental 
+    required to get there, and 'stepCost' is the incremental
     cost of expanding to that successor
-    Hint:  check out action.allPrecondsInList 
+    Hint:  check out action.allPrecondsInList
     """
     self._expanded += 1
-    "*** YOUR CODE HERE ***"       
+    actions = []
+    for act in self.actions:
+      if not act.isNoOp() and act.allPrecondsInList(state):
+        actions.append(act)
+
+    succs = []
+    for act in actions:
+      newState = copy.deepcopy(act.getAdd())
+      for p in state:
+        if p not in act.getDelete():
+          newState.append(p)
+      succs.append((newState, act, 1))
+
+    return succs
 
   def getCostOfActions(self, actions):
     return len(actions)
-    
+
   def goalStateNotInPropLayer(self, propositions):
     """
-    Helper function that returns true if all the goal propositions 
+    Helper function that returns true if all the goal propositions
     are in propositions
     """
     for goal in self.goal:
@@ -72,24 +85,67 @@ class PlanningProblem():
       add.append(prop)
       delete = []
       act = Action(name,precon,add,delete, True)
-      self.actions.append(act)  
-      
+      self.actions.append(act)
+
 def maxLevel(state, problem):
   """
   The heuristic value is the number of layers required to expand all goal propositions.
-  If the goal is not reachable from the state your heuristic should return float('inf')  
+  If the goal is not reachable from the state your heuristic should return float('inf')
   """
-  "*** YOUR CODE HERE ***"
- 
+  newPropositionLayer = PropositionLayer()
+  [newPropositionLayer.addProposition(p) for p in state]
+
+  newPlanGraphLevel = PlanGraphLevel()
+  newPlanGraphLevel.setPropositionLayer(newPropositionLayer)
+
+  level = 0
+  g = [newPlanGraphLevel]
+
+  while problem.goalStateNotInPropLayer(g[level].getPropositionLayer().getPropositions()):
+    if isFixed(g, level):
+      return float("inf")
+
+    level += 1
+    nextPlanGraphLevel = PlanGraphLevel()
+    nextPlanGraphLevel.expandWithoutMutex(g[level - 1])
+    g.append(newPlanGraphLevel)
+
+  return level
+
+
 
 def levelSum(state, problem):
   """
   The heuristic value is the sum of sub-goals level they first appeared.
   If the goal is not reachable from the state your heuristic should return float('inf')
   """
-  "*** YOUR CODE HERE ***"
-  
-  
+  total = 0
+  propLayerInit = PropositionLayer()
+
+  for prop in state:
+    propLayerInit.addProposition(prop)
+
+  pgInit = PlanGraphLevel()
+  pgInit.setPropositionLayer(propLayerInit)
+  g = [pgInit]
+  level = 0
+
+  while len(problem.goal) > 0:
+    if isFixed(g, level):
+      return float("inf")
+
+    for goal in problem.goal:
+      if goal in g[level].getPropositionLayer().getPropositions():
+        problem.goal.remove(goal)
+        total += level
+
+    nextPlanGraphLevel = PlanGraphLevel()
+    nextPlanGraphLevel.expandWithoutMutex(g[level])
+    level += 1
+    g.append(nextPlanGraphLevel)
+  return total
+
+
 def isFixed(Graph, level):
   """
   Checks if we have reached a fixed point,
@@ -97,12 +153,12 @@ def isFixed(Graph, level):
   """
   if level == 0:
     return False
-  
+
   if len(Graph[level].getPropositionLayer().getPropositions()) == len(Graph[level - 1].getPropositionLayer().getPropositions()):
     return True
-  return False  
-      
-      
+  return False
+
+
 if __name__ == '__main__':
   import sys
   import time
@@ -127,11 +183,11 @@ if __name__ == '__main__':
 
   prob = PlanningProblem(domain, problem)
   start = time.clock()
-  plan = aStarSearch(prob, heuristic)  
+  plan = aStarSearch(prob, heuristic)
   elapsed = time.clock() - start
   if plan is not None:
     print "Plan found with %d actions in %.2f seconds" % (len(plan), elapsed)
   else:
     print "Could not find a plan in %.2f seconds" %  elapsed
   print "Search nodes expanded: %d" % prob._expanded
- 
+
